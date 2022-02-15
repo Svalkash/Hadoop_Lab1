@@ -29,7 +29,9 @@ public class L1App {
         Configuration conf = new Configuration();
         // задаём выходной файл, разделенный запятыми - формат CSV в соответствии с заданием
         conf.set("mapreduce.output.textoutputformat.separator", ",");
-        conf.setStrings("metricsFile", args[2]);
+        conf.setStrings("metricIDsFile", args[2]);
+        conf.setStrings("scale", args[3]);
+        conf.setStrings("function", args[4]);
 
         Job job = Job.getInstance(conf, "Lab1Job");
         job.setJarByClass(L1App.class);
