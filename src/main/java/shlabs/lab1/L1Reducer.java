@@ -32,8 +32,6 @@ public class L1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         int result = 0;
         int cnt = 0;
         int tmp;
-        Text keyOut = new Text();
-        IntWritable valueOut = new IntWritable();
         //iterate
         while (values.iterator().hasNext()) {
             tmp = values.iterator().next().get();
@@ -63,8 +61,6 @@ public class L1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
                 result /= cnt;
                 break;
         }
-        keyOut.set(key.toString() + ", " + scaleStr);
-        valueOut.set(result);
-        context.write(keyOut, valueOut);
+        context.write(new Text(key.toString() + ", " + scaleStr), new IntWritable(result));
     }
 }
