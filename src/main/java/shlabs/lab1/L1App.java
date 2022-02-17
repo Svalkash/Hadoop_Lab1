@@ -13,14 +13,20 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import java.io.File;
 import java.io.FileReader;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 
 
 @Log4j
 public class L1App {
 
-    public static String readmetricIDs(String filename) {
+    public static String readMetricIDs(String filename) {
         //"./src/main/resources/yourfile.csv"
         CSVReader reader;
         try {
@@ -58,25 +64,7 @@ public class L1App {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-/*
-        if (args.length < 5) {
-            throw new RuntimeException("You should specify input and output folders, metcisIDs filename, scale and function!");
-        }*/
-        Configuration conf = new Configuration();
-        String metricIDs = readmetricIDs(args[2]);
-        //String metricIDs = readmetricIDs("./src/main/resources/metricNames.csv");
-        if (Objects.equals(metricIDs, "")) {
-            log.fatal("Couldn't read metricIDs, stopping.");
-            return;
-        }
-        conf.setStrings("metricIDs", metricIDs);
-        conf.setStrings("scale", args[3]);
-        conf.setStrings("function", args[4]);
-
-        //read metric IDs CSV and transform them to something nice
-
-
+    public static long runJob(Configuration conf, Path inputDir, Path outputDir) throws Exception {
         Job job = Job.getInstance(conf, "Lab1Job");
         job.setJarByClass(L1App.class);
         job.setMapperClass(L1Mapper.class);
@@ -89,17 +77,40 @@ public class L1App {
         //conf.set("mapreduce.output.textoutputformat.separator", ",");
         //job.setOutputFormatClass(TextOutputFormat.class);
 
-        Path outputDirectory = new Path(args[1]);
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, outputDirectory);
+        FileInputFormat.addInputPath(job, inputDir);
+        FileOutputFormat.setOutputPath(job, outputDir);
         log.info("=====================JOB STARTED=====================");
+        long start = System.currentTimeMillis();
         job.waitForCompletion(true);
-        log.info("=====================JOB ENDED=====================");
+        long finish = System.currentTimeMillis();
+        long timeElapsed = finish - start;
+        log.info("=====================JOB ENDED - " + timeElapsed + " seconds =====================");
         // проверяем статистику по счётчикам
         log.info("=====================COUNTERS=====================");
         Counter cntMal = job.getCounters().findCounter(CounterType.MALFORMED);
         Counter cntNF = job.getCounters().findCounter(CounterType.METRICNF);
         log.info(cntMal.getName() + ": " + cntMal.getValue());
         log.info(cntNF.getName() + ": " + cntNF.getValue());
+        return timeElapsed;
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length < 5) {
+            throw new RuntimeException("You should specify input and output folders, metcisIDs filename, scale and function!");
+        }
+        String metricIDs = readMetricIDs(args[2]);
+        //String metricIDs = readmetricIDs("./src/main/resources/metricNames.csv");
+        if (Objects.equals(metricIDs, "")) {
+            log.fatal("Couldn't read metricIDs, stopping.");
+            return;
+        }
+        Configuration conf = new Configuration();
+        conf.setStrings("metricIDs", metricIDs);
+        conf.setStrings("scale", args[3]);
+        conf.setStrings("function", args[4]);
+
+        //delete output folder before starting
+        deleteDirectory(new File(args[1]));
+        runJob(conf, new Path(args[0]), new Path(args[1]));
     }
 }

@@ -41,7 +41,7 @@ public class L1Reader {
                 writer = new FileWriter(args[1]);
             while (reader.next(key, value))
                 if (args.length > 1)
-                    writer.write("Key: " + key + " | Value: " + value);
+                    writer.write("Key: " + key + " | Value: " + value + System.lineSeparator());
                 else
                     log.info("Key: " + key + " | Value: " + value);
         } catch (Exception ex) {

@@ -21,11 +21,21 @@ public class L1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
     String scaleStr;
     long scale;
 
-    protected Map<Integer, String> metricStringToMap(String[] strArr) {
+    public static Map<Integer, String> metricStringToMap(String[] strArr) {
         Map<Integer, String> ret = new HashMap<>();
         for (int i = 0; i < strArr.length; i += 2)
             ret.put(Integer.parseInt(strArr[i]), strArr[i + 1]);
         return ret;
+    }
+
+    public static long scaleToLong(String scaleStr) {
+        return scaleStr.equals("1s") ? 1000 :
+            scaleStr.equals("10s") ? 10000 :
+                    scaleStr.equals("1m") ? 60000 :
+                            scaleStr.equals("10m") ? 60000 :
+                                    scaleStr.equals("1h") ? 360000 :
+                                            scaleStr.equals("1d") ? 8640000 :
+                                                    0; //convert it to a number
     }
 
     @Override
@@ -33,13 +43,7 @@ public class L1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         Configuration conf = context.getConfiguration();
         metricIDs = metricStringToMap(conf.getStrings("metricIDs")); //get metrics
         scaleStr = conf.getStrings("scale")[0]; //get scale from file
-        scale = scaleStr.equals("1s") ? 1000 :
-                scaleStr.equals("10s") ? 10000 :
-                        scaleStr.equals("1m") ? 60000 :
-                                scaleStr.equals("10m") ? 60000 :
-                                        scaleStr.equals("1h") ? 360000 :
-                                                scaleStr.equals("1d") ? 8640000 :
-                                                        0; //convert it to a number
+        scale = scaleToLong(scaleStr);
         if (scale == 0) {
             log.fatal("Wrong scale value provided");
             System.exit(1);
