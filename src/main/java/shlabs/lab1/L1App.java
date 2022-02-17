@@ -25,7 +25,6 @@ public class L1App {
         CSVReader reader;
         try {
             reader = new CSVReader(new FileReader(filename));
-            //reader = new CSVReader(new FileReader("yourfile.csv"));
         } catch (Exception ex) {
             log.fatal("CSV loading error: " + ex.getMessage());
             return "";
@@ -39,13 +38,13 @@ public class L1App {
             Set<Integer> numSet = new LinkedHashSet<>(); // check for duplicates
             Set<String> nameSet = new LinkedHashSet<>();
             StringBuilder ret = new StringBuilder();
-            while (stringList.iterator().hasNext()) {
-                String[] tmp = stringList.iterator().next();
-                if (!numSet.add(Integer.parseInt(tmp[0])))
+            String[] tmp;
+            for (String[] strings : stringList) {
+                if (!numSet.add(Integer.parseInt(strings[0])))
                     throw new RuntimeException("Duplicate metricIDs");
-                if (!nameSet.add(tmp[1]))
+                if (!nameSet.add(strings[1]))
                     throw new RuntimeException("Duplicate metric names");
-                ret.append(",").append(tmp[0]).append(",").append(tmp[1]);
+                ret.append(",").append(strings[0]).append(",").append(strings[1]);
             }
             return ret.substring(1);
         }
@@ -60,12 +59,18 @@ public class L1App {
     }
 
     public static void main(String[] args) throws Exception {
-
+/*
         if (args.length < 5) {
             throw new RuntimeException("You should specify input and output folders, metcisIDs filename, scale and function!");
-        }
+        }*/
         Configuration conf = new Configuration();
-        conf.setStrings("metricIDs", readmetricIDs(args[2]));
+        String metricIDs = readmetricIDs(args[2]);
+        //String metricIDs = readmetricIDs("./src/main/resources/metricNames.csv");
+        if (Objects.equals(metricIDs, "")) {
+            log.fatal("Couldn't read metricIDs, stopping.");
+            return;
+        }
+        conf.setStrings("metricIDs", metricIDs);
         conf.setStrings("scale", args[3]);
         conf.setStrings("function", args[4]);
 
@@ -81,6 +86,8 @@ public class L1App {
         job.setOutputFormatClass(TextOutputFormat.class);
 
         job.setOutputFormatClass(SequenceFileOutputFormat.class); //set output format to seq file
+        //conf.set("mapreduce.output.textoutputformat.separator", ",");
+        //job.setOutputFormatClass(TextOutputFormat.class);
 
         Path outputDirectory = new Path(args[1]);
         FileInputFormat.addInputPath(job, new Path(args[0]));
@@ -89,7 +96,10 @@ public class L1App {
         job.waitForCompletion(true);
         log.info("=====================JOB ENDED=====================");
         // проверяем статистику по счётчикам
-        Counter counter = job.getCounters().findCounter(CounterType.MALFORMED);
-        log.info("=====================COUNTERS " + counter.getName() + ": " + counter.getValue() + "=====================");
+        log.info("=====================COUNTERS=====================");
+        Counter cntMal = job.getCounters().findCounter(CounterType.MALFORMED);
+        Counter cntNF = job.getCounters().findCounter(CounterType.METRICNF);
+        log.info(cntMal.getName() + ": " + cntMal.getValue());
+        log.info(cntNF.getName() + ": " + cntNF.getValue());
     }
 }

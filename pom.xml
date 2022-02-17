@@ -55,6 +55,8 @@
         </dependency>
     </dependencies>
 
+
+
     <build>
         <plugins>
             <plugin>
@@ -68,19 +70,56 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>shlabs.lab1.L1App</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <id>build-app</id>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>shlabs.lab1.L1App</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>L1App</finalName>
+                        </configuration>
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>build-gen</id>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>shlabs.lab1.L1Gen</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>L1Gen</finalName>
+                        </configuration>
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>build-reader</id>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>shlabs.lab1.L1Reader</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>L1Reader</finalName>
+                        </configuration>
                         <phase>package</phase> <!-- bind to the packaging phase -->
                         <goals>
                             <goal>single</goal>
@@ -90,5 +129,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

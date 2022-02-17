@@ -3,6 +3,7 @@ package shlabs.lab1;
 import lombok.extern.log4j.Log4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @Log4j
 //public class L1Mapper extends Mapper<LongWritable, Text, Pair<Text, LongWritable>, IntWritable> {
-public class L1Mapper extends Mapper<IntWritable, Text, Text, IntWritable> {
+public class L1Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
     //static Map<Integer, Text> metricIDs = new HashMap<>();
     Map<Integer, String> metricIDs;
@@ -46,7 +47,7 @@ public class L1Mapper extends Mapper<IntWritable, Text, Text, IntWritable> {
     }
 
     @Override
-    protected void map(IntWritable key, Text value, Context context) throws IOException, InterruptedException {
+    protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         long[] result;
 
         try {

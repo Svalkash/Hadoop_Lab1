@@ -7,6 +7,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * Редьюсер: суммирует все единицы полученные от {@link L1Mapper}, выдаёт суммарное количество пользователей по браузерам
@@ -33,9 +34,9 @@ public class L1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         int cnt = 0;
         int tmp;
         //iterate
-        while (values.iterator().hasNext()) {
-            tmp = values.iterator().next().get();
-            switch(funStr) {
+        for (IntWritable value : values) {
+            tmp = value.get();
+            switch (funStr) {
                 case "max":
                     if (tmp > result)
                         result = tmp;

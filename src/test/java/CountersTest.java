@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 @Log4j
 public class CountersTest {
 
-    private MapDriver<IntWritable, Text, Text, IntWritable> mapDriver;
+    private MapDriver<LongWritable, Text, Text, IntWritable> mapDriver;
 
     @Before
     public void setUp() {
@@ -33,9 +33,9 @@ public class CountersTest {
     @Test
     public void testMapperCounterMalformed() throws IOException  {
         mapDriver
-                .withInput(new IntWritable(), new Text(",,,,,"))
-                .withInput(new IntWritable(), new Text("1234"))
-                .withInput(new IntWritable(), new Text("sus, sus, sus"))
+                .withInput(new LongWritable(), new Text(",,,,,"))
+                .withInput(new LongWritable(), new Text("1234"))
+                .withInput(new LongWritable(), new Text("sus, sus, sus"))
                 .runTest();
 
         assertEquals("Expected 3 MALFORMED increment", 3,
@@ -47,7 +47,7 @@ public class CountersTest {
     @Test
     public void testMapperCounterNotFound() throws IOException  {
         mapDriver
-                .withInput(new IntWritable(), new Text("3, 123, 54"))
+                .withInput(new LongWritable(), new Text("3, 123, 54"))
                 .runTest();
 
         assertEquals("Expected no MALFORMED increment", 0,
@@ -59,7 +59,7 @@ public class CountersTest {
     @Test
     public void testMapperCounterNone() throws IOException  {
         mapDriver
-                .withInput(new IntWritable(), new Text("1, 2022, 50"))
+                .withInput(new LongWritable(), new Text("1, 2022, 50"))
                 .withOutput(new Text("metricName, 2000"), new IntWritable(50))
                 .runTest();
 
@@ -72,9 +72,9 @@ public class CountersTest {
     @Test
     public void testMapperCounters() throws IOException {
         mapDriver
-                .withInput(new IntWritable(), new Text("sus, sus, sus"))
-                .withInput(new IntWritable(), new Text("3, 123, 54"))
-                .withInput(new IntWritable(), new Text("1, 2022, 50"))
+                .withInput(new LongWritable(), new Text("sus, sus, sus"))
+                .withInput(new LongWritable(), new Text("3, 123, 54"))
+                .withInput(new LongWritable(), new Text("1, 2022, 50"))
                 .withOutput(new Text("metricName, 2000"), new IntWritable(50))
                 .runTest();
 
