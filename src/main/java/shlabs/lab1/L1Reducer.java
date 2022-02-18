@@ -59,12 +59,10 @@ public class L1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         }
         // Финальные вычисления для avg
         switch(funStr) {
-            case "max":
-            case "min":
-                break;
             case "avg":
-            default:
                 result /= cnt;
+                break;
+            default:
                 break;
         }
         // Формирование финальной строки - добавляем масштаб в строковом виде.
