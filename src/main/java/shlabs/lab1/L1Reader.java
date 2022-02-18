@@ -20,12 +20,18 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-
+/**
+ * Расшифровщик SequenceFile.
+ * Ожидаемые аргументы:
+ * 0. Имя входного файла (не директории).
+ * 1 (опционально). Имя выходного файла.
+ * Если аргумент 1 отсутствует, данные выводятся в консоль.
+ */
 @Log4j
 public class L1Reader {
 
     public static void main(String[] args) throws Exception {
-
+        // Проверка аргументов
         if (args.length < 1)
             throw new RuntimeException("You should specify input (and optionally - output) files!");
 
@@ -37,12 +43,12 @@ public class L1Reader {
             Text key = new Text();
             IntWritable value = new IntWritable();
             reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(inFile), SequenceFile.Reader.bufferSize(4096));
-            if (args.length > 1)
+            if (args.length > 1) // Если есть аргумент 1, открываем файл на запись
                 writer = new FileWriter(args[1]);
             while (reader.next(key, value))
-                if (args.length > 1)
+                if (args.length > 1) // Вывод в файл
                     writer.write("Key: " + key + " | Value: " + value + System.lineSeparator());
-                else
+                else // Вывод в консоль
                     log.info("Key: " + key + " | Value: " + value);
         } catch (Exception ex) {
             log.fatal("Error: " + ex.getMessage());

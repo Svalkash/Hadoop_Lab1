@@ -14,35 +14,47 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Тесты общей работоспособности классов маппера и редьюсера.
+ */
 public class MapReduceTest {
 
     private MapDriver<LongWritable, Text, Text, IntWritable> mapDriver;
     private ReduceDriver<Text, IntWritable, Text, IntWritable> reduceDriver;
     private MapReduceDriver<LongWritable, Text, Text, IntWritable, Text, IntWritable> mapReduceDriver;
 
+    /**
+     * Начальная настройка, подготовка параметров конфигурации.
+     */
     @Before
     public void setUp() {
+        String metricIDsStr = "1,metricName,2,secondName"; // Тестовая строка с расшифровкой metricID
+        String scaleStr = "1m"; // Масштаб - 1 минута
+        String functionStr = "avg"; // Функция - усреднение
+
         L1Mapper mapper = new L1Mapper();
         L1Reducer reducer = new L1Reducer();
+        // Конфигурация драйвера маппера
         mapDriver = MapDriver.newMapDriver(mapper);
         Configuration confM = mapDriver.getConfiguration();
-        String metricIDsStr = "1,metricName,2,secondName";
         confM.setStrings("metricIDs", metricIDsStr);
-        String scaleStr = "1m";
         confM.setStrings("scale", scaleStr);
-        reduceDriver = ReduceDriver.newReduceDriver(reducer);
+        // Конфигурация драйвера редьюсера
+        reduceDriver = ReduceDriver.newReduceDriver(reducer); 
         Configuration confR = reduceDriver.getConfiguration();
-        String functionStr = "avg";
         confR.setStrings("function", functionStr);
         confR.setStrings("scale", scaleStr);
+        // Конфигурация драйвера MapReduce
         mapReduceDriver = MapReduceDriver.newMapReduceDriver(mapper, reducer);
-        Configuration confMR = mapReduceDriver.getConfiguration();
+        Configuration confMR = mapReduceDriver.getConfiguration(); 
         confMR.setStrings("metricIDs", metricIDsStr);
         confMR.setStrings("scale", scaleStr);
         confMR.setStrings("function", functionStr);
     }
 
+    /**
+     * Тест маппера - проверка расшифровки metricID и округления времени 
+     */
     @Test
     public void testMapper() throws IOException {
         mapDriver
@@ -51,6 +63,10 @@ public class MapReduceTest {
                 .runTest();
     }
 
+    /**
+     * Тест редьюсера - проверка функции усреднения
+     * Других функций в задании не было
+     */
     @Test
     public void testReducer() throws IOException {
         List<IntWritable> values = new ArrayList<>();
@@ -63,6 +79,9 @@ public class MapReduceTest {
                 .runTest();
     }
 
+    /**
+     * Тест одновременной работы маппера и редьюсера
+     */
     @Test
     public void testMapReduce() throws IOException {
         mapReduceDriver

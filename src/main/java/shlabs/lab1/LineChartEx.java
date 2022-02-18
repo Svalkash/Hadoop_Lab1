@@ -13,12 +13,16 @@ import org.jfree.data.xy.XYDataset;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Класс для отображения графика.
+ */
 public class LineChartEx extends JFrame {
 
     public LineChartEx(XYDataset dataset) {
         initUI(dataset);
     }
 
+    // Запуск окна с графиком
     private void initUI(XYDataset dataset) {
         JFreeChart chart = createChart(dataset);
 
@@ -33,6 +37,8 @@ public class LineChartEx extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    // Создание объекта графика на основе набора данных
+    // Имена фиксированные, потому что мне было лень их везде добавлять.
     private JFreeChart createChart(XYDataset dataset) {
 
         JFreeChart chart = ChartFactory.createXYLineChart(
