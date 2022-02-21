@@ -37,17 +37,18 @@ public class L1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         int result = 0;
         int cnt = 0;
         int tmp;
+        boolean first = true;
         //Итерация по массиву значений
         for (IntWritable value : values) {
             tmp = value.get();
             // Применение функции
             switch (funStr) {
                 case "max":
-                    if (tmp > result)
+                    if (tmp > result || first)
                         result = tmp;
                     break;
                 case "min":
-                    if (tmp < result)
+                    if (tmp < result || first)
                         result = tmp;
                     break;
                 case "avg":
@@ -56,6 +57,8 @@ public class L1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
                     ++cnt;
                     break;
             }
+            if (first)
+                first = false;
         }
         // Финальные вычисления для avg
         switch(funStr) {
